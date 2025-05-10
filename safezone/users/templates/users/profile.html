@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Профиль{% endblock %}
+{% block content %}
+  <h2>Профиль пользователя</h2>
+
+  <p><strong>Имя пользователя:</strong> {{ user.username }}</p>
+  <p><strong>Роль:</strong> {{ user.get_role_display }}</p>
+  <p><strong>Email:</strong> {{ user.email }}</p>
+
+  <hr>
+
+  <form method="post" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Выйти из системы</button>
+  </form>
+{% endblock %}

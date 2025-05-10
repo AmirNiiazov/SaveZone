@@ -11,7 +11,12 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import environ
 
+
+env = environ.Env()
+
+environ.Env.read_env()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,14 +25,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-^4x57gco#)-dwss_(srpu+9rsy97luvgxthf%!3hmwmuec&s_5'
+SECRET_KEY = env.str('DJANGO_SECRET', None)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool('DEBUG', None)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
-
+AUTH_USER_MODEL = 'users.User'
 # Application definition
 
 INSTALLED_APPS = [
@@ -56,7 +61,7 @@ ROOT_URLCONF = 'safezone.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -76,8 +81,19 @@ WSGI_APPLICATION = 'safezone.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'safe_zone_db',
+        'USER': env.str('DB_USER', None),
+        'PASSWORD': env.str('DB_PASSWORD', None),
+        'HOST': 'localhost',
+        'CONN_MAX_AGE': 0,
+        'OPTIONS': {
+            'pool': {
+                'min_size': 1,     # минимально держать 1 соединение
+                'max_size': 6,    # максимально 6 соединений
+                'timeout': 60
+            }
+        }
     }
 }
 
@@ -106,13 +122,18 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Karachi'
 
 USE_I18N = True
 
 USE_TZ = True
 
+LOGIN_REDIRECT_URL = '/users/dashboard/'
 
+LOGIN_URL = '/users/login/'
+
+MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = '/media/'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 

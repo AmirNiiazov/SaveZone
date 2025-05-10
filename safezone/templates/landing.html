@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Главная{% endblock %}
+{% block content %}
+  <div class="text-center">
+    <h1 class="mb-4">Добро пожаловать в SafeZone</h1>
+    <p>Система контроля и управления доступом</p>
+    <a href="{% url 'login' %}" class="btn btn-primary mt-3">Войти</a>
+  </div>
+{% endblock %}
