@@ -1,6 +1,50 @@
 {% extends "base.html" %}
-{% block title %}История проходов{% endblock %}
+{% block title %}Журнал проходов{% endblock %}
 {% block content %}
-  <h2>Журнал проходов</h2>
-  <p>История всех событий доступа.</p>
+    <h2>Журнал проходов</h2>
+
+    <form method="get" class="mb-3">
+        <div class="input-group">
+            <input type="text" name="q" class="form-control"
+                   placeholder="{% if user.role == 'admin' %}Поиск по ФИО или турникету{% else %}Поиск по ФИО, турникету или объекту{% endif %}"
+                   value="{{ query }}">
+            <button class="btn btn-outline-secondary" type="submit">Поиск</button>
+        </div>
+    </form>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle">
+            <thead class="table-dark">
+            <tr>
+                {% if user.role == 'superadmin' or user.role == 'technician' %}
+                    <th>Объект</th>
+                {% endif %}
+                <th>ФИО</th>
+                <th>Время прохода</th>
+                <th>Турникет</th>
+                <th>Начало действия</th>
+                <th>Окончание действия</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for log in page_obj %}
+                <tr>
+                    {% if user.role == 'superadmin' or user.role == 'technician' %}
+                        <td>{{ log.device.facility.title }}</td>
+                    {% endif %}
+                    <td>{{ log.access_pass.full_name }}</td>
+                    <td>{{ log.timestamp|date:"d.m.Y H:i:s" }}</td>
+                    <td>{{ log.device.title }}</td>
+                    <td>{{ log.access_pass.valid_from|date:"d.m.Y H:i:s" }}</td>
+                    <td>{{ log.access_pass.valid_to|date:"d.m.Y H:i:s" }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted">Записей пока нет</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include "core/partials/pagination.html" %}
 {% endblock %}

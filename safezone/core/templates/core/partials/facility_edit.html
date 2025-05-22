@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Редактирование объекта{% endblock %}
+{% block content %}
+    <h2>Редактирование объекта: {{ facility.title }}</h2>
+    {% include "core/partials/form_base.html" with form=form cancel_url='facilities' %}
+{% endblock %}

@@ -1,6 +1,92 @@
 {% extends "base.html" %}
 {% block title %}Приглашения{% endblock %}
 {% block content %}
-  <h2>Выдача приглашений</h2>
-  <p>Форма для создания приглашений.</p>
+    <h2>Приглашения</h2>
+
+    <form method="get" class="mb-3">
+        <div class="input-group">
+            <input type="text" name="q" class="form-control" placeholder="Поиск по email или объекту"
+                   value="{{ query }}">
+            <button class="btn btn-outline-secondary" type="submit">Поиск</button>
+        </div>
+    </form>
+
+    <a href="{% url 'invite_create' %}" class="btn btn-primary mb-4">Создать приглашение</a>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-dark">
+            <tr>
+                <th>Email</th>
+                <th>Объект</th>
+                <th>Ссылка на регистрацию</th>
+                <th>Статус</th>
+                <th>Создано</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for invite in invites %}
+                <tr>
+                    <td>{{ invite.email }}</td>
+                    <td>{{ invite.facility.title }}</td>
+                    <td>
+                        <input type="text"
+                               class="token-url visually-hidden"
+                               value="{{ request.scheme }}://{{ request.get_host }}{% url 'register' %}?token={{ invite.token }}"
+                               readonly>
+                        <button type="button" class="btn btn-outline-dark btn-sm copy-btn">
+                            Скопировать ссылку
+                        </button>
+                    </td>
+                    <td>
+                        {% if invite.used_at %}
+                            <span class="badge bg-secondary">Использовано</span>
+                        {% else %}
+                            <span class="badge bg-success">Активно</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ invite.created_at|date:"d.m.Y H:i:s" }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5" class="text-muted text-center">Приглашений пока нет</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+  
+    {% include "core/partials/pagination.html" %}
+
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.copy-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const input = this.previousElementSibling;
+                    input.classList.remove('visually-hidden');
+                    input.select();
+                    input.setSelectionRange(0, 99999); // для мобильных устройств
+
+                    const copied = document.execCommand('copy');
+                    input.classList.add('visually-hidden');
+
+                    if (copied) {
+                        this.textContent = 'Скопировано!';
+                        this.classList.remove('btn-outline-dark');
+                        this.classList.add('btn-success');
+                        setTimeout(() => {
+                            this.textContent = 'Скопировать ссылку';
+                            this.classList.remove('btn-success');
+                            this.classList.add('btn-outline-dark');
+                        }, 1500);
+                    } else {
+                        alert("Не удалось скопировать");
+                    }
+                });
+            });
+        });
+    </script>
 {% endblock %}

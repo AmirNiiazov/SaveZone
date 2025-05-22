@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}QR пропуска{% endblock %}
+{% block content %}
+  <h2>QR-код для пропуска {{ pass_obj.full_name }}</h2>
+  {% if pass_obj.qr_code %}
+    <img src="{{ pass_obj.qr_code.url }}" alt="QR-код" class="img-fluid" style="max-width: 300px;">
+    <div class="mt-3">
+      <a href="{{ pass_obj.qr_code.url }}" class="btn btn-primary" download>Скачать QR</a>
+      <a href="{% url 'passes' %}" class="btn btn-secondary">Назад</a>
+    </div>
+  {% else %}
+    <p class="text-danger">QR-код не найден</p>
+  {% endif %}
+{% endblock %}

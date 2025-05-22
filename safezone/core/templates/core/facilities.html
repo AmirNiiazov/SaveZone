@@ -1,6 +1,40 @@
 {% extends "base.html" %}
 {% block title %}Объекты{% endblock %}
 {% block content %}
-  <h2>Объекты</h2>
-  <p>Управление списком объектов.</p>
+    <h2>Объекты</h2>
+    <form method="get" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="q" class="form-control" placeholder="Поиск по названию объекта"
+                   value="{{ query }}">
+            <button class="btn btn-outline-secondary" type="submit">Поиск</button>
+        </div>
+    </form>
+    {% if user.role == 'superadmin' %}
+        <a href="{% url 'facility_create' %}" class="btn btn-primary mb-3">Создать объект</a>
+    {% endif %}
+    <ul class="list-group mb-4">
+        {% for facility in facilities %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>{{ facility.title }}</strong><br>
+                    {{ facility.location }}<br>
+                    <small>{{ facility.description }}</small>
+                </div>
+                {% if user.role == 'superadmin' %}
+                    <a href="{% url 'facility_edit' facility.id %}" class="btn btn-sm btn-outline-secondary">Редактировать</a>
+                {% endif %}
+            </li>
+        {% empty %}
+            <li class="list-group-item text-muted">Объекты отсутствуют</li>
+        {% endfor %}
+    </ul>
+
+    {% if form %}
+        <h3>Создать новый объект</h3>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Создать</button>
+        </form>
+    {% endif %}
 {% endblock %}

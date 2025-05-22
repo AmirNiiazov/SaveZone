@@ -1,6 +1,37 @@
 {% extends "base.html" %}
-{% block title %}Устройства{% endblock %}
+{% block title %}Турникеты{% endblock %}
 {% block content %}
-  <h2>Устройства</h2>
-  <p>Просмотр и привязка устройств к объектам.</p>
+    <h2>Турникеты</h2>
+    <form method="get" class="mb-3">
+        <div class="input-group">
+            <input type="text" name="q" class="form-control" placeholder="Поиск по названию устройства или объекта"
+                   value="{{ query }}">
+            <button class="btn btn-outline-secondary" type="submit">Поиск</button>
+        </div>
+    </form>
+    {% if user.role == 'superadmin' or user.role == 'technician' %}
+        <a href="{% url 'device_create' %}" class="btn btn-primary mb-3">Создать турникет</a>
+    {% endif %}
+
+    <ul class="list-group">
+        {% for device in devices %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>{{ device.title }}</strong>
+                    — {{ device.facility.title }}
+                    {% if device.is_active %}
+                        <span class="badge bg-success ms-2">● Активен</span>
+                    {% else %}
+                        <span class="badge bg-danger ms-2">● Неактивен</span>
+                    {% endif %}
+                    {% if device.description %}
+                        <br><small>{{ device.description }}</small>
+                    {% endif %}
+                </div>
+                <a href="{% url 'device_view' device.pk %}" class="btn btn-outline-primary btn-sm">Просмотреть</a>
+            </li>
+        {% empty %}
+            <li class="list-group-item text-muted">Нет турникетов</li>
+        {% endfor %}
+    </ul>
 {% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Просмотр турникета{% endblock %}
+{% block content %}
+  <h2>Турникет: {{ device.title }}</h2>
+
+  <p><strong>Объект:</strong> {{ device.facility.title }}</p>
+  <p><strong>Активен:</strong> {{ device.is_active|yesno:"Да,Нет" }}</p>
+  <p><strong>Описание:</strong> {{ device.description|default:"—" }}</p>
+  <p><strong>API URL:</strong> {{ device.api_url }}</p>
+  <p><strong>API токен:</strong> {{ device.api_token }}</p>
+
+  {% if user.role == 'superadmin' or user.role == 'technician' %}
+    <a href="{% url 'device_edit' device.pk %}" class="btn btn-primary">Редактировать</a>
+    <a href="{% url 'device_delete' device.pk %}" class="btn btn-danger">Удалить</a>
+  {% endif %}
+
+  <a href="{% url 'devices' %}" class="btn btn-secondary">Назад</a>
+{% endblock %}

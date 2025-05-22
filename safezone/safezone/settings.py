@@ -30,6 +30,8 @@ SECRET_KEY = env.str('DJANGO_SECRET', None)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', None)
 
+CRYPTO_KEY = env.str('CRYPTO_KEY', None)
+
 ALLOWED_HOSTS = ['*']
 
 AUTH_USER_MODEL = 'users.User'
@@ -120,7 +122,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'RU-ru'
 
 TIME_ZONE = 'Asia/Karachi'
 

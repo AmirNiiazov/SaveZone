@@ -1,6 +1,14 @@
 {% extends "base.html" %}
 {% block title %}Главная{% endblock %}
+
 {% block content %}
   <h2>Добро пожаловать, {{ user.get_full_name|default:user.username }}</h2>
-  <p>Это главная страница после входа.</p>
+
+  {% if user.role == 'superadmin' %}
+    {% include "users/partials/dashboard_superadmin.html" %}
+  {% elif user.role == 'admin' %}
+    {% include "users/partials/dashboard_admin.html" %}
+  {% elif user.role == 'technician' %}
+    {% include "users/partials/dashboard_technician.html" %}
+  {% endif %}
 {% endblock %}

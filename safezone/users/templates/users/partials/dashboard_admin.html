@@ -1,0 +1,39 @@
+<h4>Объект: {{ user.facility.title }}</h4>
+
+<div class="row">
+  {% include "users/partials/card.html" with title="Устройства" value=device_count color="#6b7280" %}
+  {% include "users/partials/card.html" with title="Пропуска" value=pass_count color="#78866b" %}
+  {% include "users/partials/card.html" with title="Проходов сегодня" value=log_today_count color="#7d6e83" %}
+  {% include "users/partials/card.html" with title="Проходов всего" value=log_count color="#5a6e6c" %}
+</div>
+
+<div class="row mt-4">
+  <div class="col-md-6">
+    <h4>Последние пропуска</h4>
+    <ul class="list-group mb-2">
+      {% for p in latest_passes %}
+        <li class="list-group-item">
+          <strong>{{ p.full_name }}</strong><br>
+          <small>Действителен до {{ p.valid_to|date:"d.m.Y H:i" }}</small>
+        </li>
+      {% empty %}
+        <li class="list-group-item text-muted">Нет выданных пропусков</li>
+      {% endfor %}
+    </ul>
+    <a href="{% url 'passes' %}" class="btn btn-outline-primary btn-sm">Перейти к пропускам</a>
+  </div>
+
+  <div class="col-md-6">
+    <h4>Последние проходы</h4>
+    <ul class="list-group mb-2">
+      {% for log in latest_logs %}
+        <li class="list-group-item">
+          {{ log.timestamp|date:"d.m.Y H:i:s" }} — {{ log.access_pass.full_name }} через {{ log.device.title }}
+        </li>
+      {% empty %}
+        <li class="list-group-item text-muted">Нет событий</li>
+      {% endfor %}
+    </ul>
+    <a href="{% url 'logs' %}" class="btn btn-outline-primary btn-sm">Перейти к журналу</a>
+  </div>
+</div>

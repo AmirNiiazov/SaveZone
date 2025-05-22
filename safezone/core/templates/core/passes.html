@@ -2,5 +2,65 @@
 {% block title %}Пропуска{% endblock %}
 {% block content %}
   <h2>Пропуска</h2>
-  <p>Создание, просмотр и редактирование пропусков.</p>
+  <form method="get" class="mb-3">
+  <div class="input-group">
+    <input type="text" name="q" class="form-control"
+           placeholder="{% if user.role == 'admin' %}Поиск по ФИО или турникету{% else %}Поиск по ФИО, турникету или объекту{% endif %}"
+           value="{{ query }}">
+    <button class="btn btn-outline-secondary" type="submit">Поиск</button>
+  </div>
+</form>
+{% if messages %}
+  <div class="container mt-3">
+    {% for message in messages %}
+      {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      {% else %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+      {% endif %}
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Закрыть"></button>
+        </div>
+    {% endfor %}
+  </div>
+{% endif %}
+  <a href="{% url 'pass_create' %}" class="btn btn-primary mb-3">Создать пропуск</a>
+
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>ФИО</th>
+          <th>Объект</th>
+          <th>Турникет</th>
+          <th>Действует с</th>
+          <th>По</th>
+          <th>Комментарий</th>
+          <th class="text-center" style="width: 220px;">Действия</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pass in page_obj %}
+          <tr>
+            <td>{{ pass.full_name }}</td>
+            <td>{{ pass.facility.title }}</td>
+            <td>{{ pass.device.title }}</td>
+            <td>{{ pass.valid_from|date:"d.m.Y H:i:s" }}</td>
+            <td>{{ pass.valid_to|date:"d.m.Y H:i:s" }}</td>
+            <td>{{ pass.note|default:"—" }}</td>
+            <td class="text-center">
+              <div class="btn-group">
+                <a href="{% url 'pass_qr' pass.pk %}" class="btn btn-sm btn-outline-info">Просмотреть</a>
+                <a href="{% url 'pass_delete' pass.pk %}" class="btn btn-sm btn-outline-danger">Удалить</a>
+              </div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="7" class="text-muted text-center">Пропусков пока нет</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% include "core/partials/pagination.html" %}
 {% endblock %}
