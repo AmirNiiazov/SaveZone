@@ -108,7 +108,7 @@ def invites_view(request):
 
     invites = invites.order_by('-created_at')
 
-    paginator = Paginator(invites, 25)  # по 25 приглашений на страницу
+    paginator = Paginator(invites, 20)  # по 25 приглашений на страницу
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
