@@ -6,6 +6,7 @@ from django.contrib import messages
 from .models import Facilities, Devices, AccessLogs, AccessPasses
 from .forms import FacilityForm, DeviceForm, AccessPassForm
 from .service import OrangePiClient
+from safezone.settings import DEBUG
 
 
 @login_required
@@ -164,13 +165,14 @@ def pass_create_view(request):
             access_pass = form.save(commit=False)
             access_pass.facility = request.user.facility
             access_pass.save()
-            if access_pass.device:
-                res = OrangePiClient(device_id=access_pass.device.id).send_pass(access_pass.pk)
-            else:
-                res = OrangePiClient(facility_id=access_pass.facility_id).send_pass(access_pass.pk)
-            if not res:
-                messages.error(request, "Ошибка при отправке пропуска на турникет.")
-                access_pass.delete()
+            if not DEBUG:
+                if access_pass.device:
+                    res = OrangePiClient(device_id=access_pass.device.id).send_pass(access_pass.pk)
+                else:
+                    res = OrangePiClient(facility_id=access_pass.facility_id).send_pass(access_pass.pk)
+                if not res:
+                    messages.error(request, "Ошибка при отправке пропуска на турникет.")
+                    access_pass.delete()
             return redirect('passes')
     else:
         form = AccessPassForm(user=request.user)
@@ -183,12 +185,15 @@ def pass_delete_view(request, pk):
     access_pass = get_object_or_404(AccessPasses, pk=pk, facility=request.user.facility)
 
     if request.method == 'POST':
-        if access_pass.device:
-            res = OrangePiClient(device_id=access_pass.device.id).delete_pass(access_pass.pk)
-        else:
-            res = OrangePiClient(facility_id=access_pass.facility_id).delete_pass(access_pass.pk)
-        if not res:
-            messages.error(request, "Ошибка при удалении пропуска с турникета.")
+        if not DEBUG:
+            if access_pass.device:
+                res = OrangePiClient(device_id=access_pass.device.id).delete_pass(access_pass.pk)
+            else:
+                res = OrangePiClient(facility_id=access_pass.facility.id).delete_pass(access_pass.pk)
+            if not res:
+                messages.error(request, "Ошибка при удалении пропуска с турникета.")
+            else:
+                access_pass.delete()
         else:
             access_pass.delete()
         return redirect('passes')
